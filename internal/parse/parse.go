@@ -7,16 +7,21 @@ import (
 	"github.com/hashicorp/hcl/v2/hclparse"
 )
 
+// Parser knows how to parse HCL files.
 type Parser struct {
 	*hclparse.Parser
 }
 
+// NewParser creates a new instance of Parser, wrapping around hclparse.Parser.
 func NewParser() *Parser {
 	return &Parser{
 		Parser: hclparse.NewParser(),
 	}
 }
 
+// ParseHCL is a simple wrapper around hclparse.Parser.ParseHCL.
+// It reads the content of the given file and parses it into an *hcl.File.
+// The function returns the parsed file along with any diagnostics produced.
 func (p *Parser) ParseHCL(fileName string) (*hcl.File, hcl.Diagnostics) {
 	var diags hcl.Diagnostics
 
