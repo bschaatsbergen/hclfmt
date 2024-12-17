@@ -1,6 +1,7 @@
 package parse
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/hashicorp/hcl/v2"
@@ -28,8 +29,9 @@ func (p *Parser) ParseHCL(fileName string) (*hcl.File, hcl.Diagnostics) {
 	inContent, err := os.ReadFile(fileName)
 	if err != nil {
 		diags = append(diags, &hcl.Diagnostic{
-			Summary: "Failed to read file",
-			Detail:  err.Error(),
+			Severity: hcl.DiagError,
+			Summary:  fmt.Sprintf("Failed to read file: \"%s\"", fileName),
+			Detail:   err.Error(),
 		})
 		return nil, diags
 	}

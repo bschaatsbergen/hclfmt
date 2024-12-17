@@ -16,8 +16,9 @@ func WriteHCL(f *hcl.File, fileName string, overwrite bool) hcl.Diagnostics {
 		_, err := fmt.Fprintln(os.Stdout, string(f.Bytes))
 		if err != nil {
 			diags = append(diags, &hcl.Diagnostic{
-				Summary: "Failed to write to stdout",
-				Detail:  err.Error(),
+				Severity: hcl.DiagError,
+				Summary:  "Failed to write to stdout",
+				Detail:   err.Error(),
 			})
 		}
 		return diags
@@ -26,8 +27,9 @@ func WriteHCL(f *hcl.File, fileName string, overwrite bool) hcl.Diagnostics {
 	outContent := hclwrite.Format(f.Bytes)
 	if err := os.WriteFile(fileName, outContent, 0644); err != nil {
 		diags = append(diags, &hcl.Diagnostic{
-			Summary: "Failed to write file",
-			Detail:  err.Error(),
+			Severity: hcl.DiagError,
+			Summary:  fmt.Sprintf("Failed to write to file: \"%s\"", fileName),
+			Detail:   err.Error(),
 		})
 	}
 

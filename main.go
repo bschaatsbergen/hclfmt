@@ -69,6 +69,17 @@ func main() {
 	}
 	diagWriter = hcl.NewDiagnosticTextWriter(os.Stderr, parser.Files(), uint(width), color)
 
+	_, err = os.Stat(fileName)
+	if err != nil {
+		diags = append(diags, &hcl.Diagnostic{
+			Severity: hcl.DiagError,
+			Summary:  fmt.Sprintf("No file or directory at \"%s\"", fileName),
+			Detail:   err.Error(),
+		})
+		diagWriter.WriteDiagnostics(diags)
+		os.Exit(1)
+	}
+
 	f, parseDiags := parser.ParseHCL(fileName)
 	diags = append(diags, parseDiags...)
 	if diags.HasErrors() {
