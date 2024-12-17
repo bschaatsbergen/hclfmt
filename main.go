@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/mitchellh/cli"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 const (
@@ -20,7 +21,8 @@ const (
 )
 
 var (
-	overwrite bool
+	overwrite  bool
+	diagWriter hcl.DiagnosticWriter
 )
 
 func main() {
@@ -35,8 +37,6 @@ func main() {
 		fmt.Fprint(os.Stdout, cli.HelpFunc(cli.Commands))
 		os.Exit(0)
 	}
-
-	// hclfmt flags
 	flags.BoolVar(&overwrite, "write", false, "write result to source file instead of stdout")
 
 	if err := flags.Parse(cli.Args); err != nil {
@@ -61,21 +61,27 @@ func main() {
 	fileName := flags.Arg(0)
 
 	parser := parse.NewParser()
+
+	color := terminal.IsTerminal(int(os.Stderr.Fd()))
+	width, _, err := terminal.GetSize(int(os.Stdout.Fd()))
+	if err != nil {
+		width = 80
+	}
+	diagWriter = hcl.NewDiagnosticTextWriter(os.Stderr, parser.Files(), uint(width), color)
+
 	f, parseDiags := parser.ParseHCL(fileName)
 	diags = append(diags, parseDiags...)
 	if diags.HasErrors() {
-		parser.DiagWriter.WriteDiagnostics(diags)
+		diagWriter.WriteDiagnostics(diags)
 		os.Exit(1)
 	}
 
-	// Format takes source code and performs simple whitespace changes to transform
-	// it to a canonical layout style.
 	f.Bytes = hclwrite.Format(f.Bytes)
 
 	writeDiags := write.WriteHCL(f, fileName, overwrite)
 	diags = append(diags, writeDiags...)
 	if diags.HasErrors() {
-		parser.DiagWriter.WriteDiagnostics(diags)
+		diagWriter.WriteDiagnostics(diags)
 		os.Exit(1)
 	}
 

@@ -9,14 +9,11 @@ import (
 
 type Parser struct {
 	*hclparse.Parser
-	DiagWriter hcl.DiagnosticWriter
 }
 
 func NewParser() *Parser {
-	p := hclparse.NewParser()
 	return &Parser{
-		Parser:     p,
-		DiagWriter: hcl.NewDiagnosticTextWriter(os.Stderr, p.Files(), 80, true),
+		Parser: hclparse.NewParser(),
 	}
 }
 
