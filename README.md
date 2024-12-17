@@ -7,7 +7,7 @@ At HashiCorp we recommend that products using HCL implement their own formatter,
 
 Applications that do implement their own formatter typically build on top of the generic HCL formatting process but extend it with logic to handle domain-specific constructs and idiomatic conventions. Here’s how that process generally works:
 
-1. Applications use [hclwrite](https://pkg.go.dev/github.com/hashicorp/hcl/v2/hclwrite) parser to generate a hybrid structure that combines an abstract syntax tree (AST) with a physical syntax tree. This hybrid structure allows for both logical analysis and any surgical changes to normalize the configuration.
+1. Applications use [hclwrite](https://pkg.go.dev/github.com/hashicorp/hcl/v2/hclwrite) parser to generate a hybrid structure that produces an abstract / physical syntax tree. This hybrid structure allows for both logical analysis and any surgical changes to normalize the configuration.
 2. The application adds custom logic to normalize HCL configurations by rewriting constructs into the idiomatic form preferred by the application. This may involve reordering attributes, adjusting whitespace, modifying indentation, or enforcing specific conventions for expressions and relationships within the configuration.
 3. Once the normalization is complete, the formatter serializes the updated AST back into HCL syntax using [hclwrite](https://pkg.go.dev/github.com/hashicorp/hcl/v2/hclwrite) package's formatter.
 
