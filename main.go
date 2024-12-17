@@ -7,11 +7,11 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/bschaatsbergen/hclfmt/internal/format"
 	"github.com/bschaatsbergen/hclfmt/internal/parse"
 	"github.com/bschaatsbergen/hclfmt/internal/write"
 	"github.com/bschaatsbergen/hclfmt/version"
 	"github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/mitchellh/cli"
 	"golang.org/x/term"
 )
@@ -85,7 +85,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	formattedBytes := format.FormatHCL(f.Bytes)
+	formattedBytes := hclwrite.Format(f.Bytes)
 
 	if !flagStore.Overwrite {
 		_, err := fmt.Fprintln(os.Stdout, string(formattedBytes))
