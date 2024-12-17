@@ -36,7 +36,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	// Available flags for hcqr
+	// hclfmt flags
 	flags.BoolVar(&overwrite, "write", false, "write result to source file instead of stdout")
 
 	if err := flags.Parse(cli.Args); err != nil {
