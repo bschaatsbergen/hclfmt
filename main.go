@@ -5,19 +5,22 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strings"
 	"text/tabwriter"
 
 	"github.com/bschaatsbergen/hclfmt/version"
 	"github.com/mitchellh/cli"
 )
 
+const (
+	cliName = "hclfmt"
+)
+
 func main() {
-	cli := cli.NewCLI("hclfmt", version.Version)
+	cli := cli.NewCLI(cliName, version.Version)
 	cli.Args = os.Args[1:]
 	cli.HelpFunc = Help()
 
-	flags := flag.NewFlagSet("hclfmt", flag.ExitOnError)
+	flags := flag.NewFlagSet(cliName, flag.ExitOnError)
 	flags.Usage = func() {
 		fmt.Fprint(os.Stdout, cli.HelpFunc(cli.Commands))
 		os.Exit(0)
@@ -54,6 +57,6 @@ func Help() cli.HelpFunc {
 		fmt.Fprintln(tw, "Examples:")
 		fmt.Fprintln(tw, "    hclfmt example.hcl")
 
-		return strings.TrimSpace(b.String())
+		return b.String()
 	}
 }
