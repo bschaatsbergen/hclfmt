@@ -1,5 +1,4 @@
 resource "foobar" "test" {
   name = "foobar"
-  tags = ["a", "b", "c"]
-
-}x
+   tags = ["a", "b", "c"]
+}

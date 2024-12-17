@@ -11,11 +11,16 @@ import (
 	"github.com/bschaatsbergen/hclfmt/internal/write"
 	"github.com/bschaatsbergen/hclfmt/version"
 	"github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/mitchellh/cli"
 )
 
 const (
 	cliName = "hclfmt"
+)
+
+var (
+	overwrite bool
 )
 
 func main() {
@@ -30,6 +35,9 @@ func main() {
 		fmt.Fprint(os.Stdout, cli.HelpFunc(cli.Commands))
 		os.Exit(0)
 	}
+
+	// Available flags for hcqr
+	flags.BoolVar(&overwrite, "write", false, "write result to source file instead of stdout")
 
 	if err := flags.Parse(cli.Args); err != nil {
 		fmt.Fprintf(os.Stderr, "Error parsing flags: %v\n", err)
@@ -60,15 +68,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	writeDiags := write.WriteHCL(f, fileName)
+	// Format takes source code and performs simple whitespace changes to transform
+	// it to a canonical layout style.
+	f.Bytes = hclwrite.Format(f.Bytes)
+
+	writeDiags := write.WriteHCL(f, fileName, overwrite)
 	diags = append(diags, writeDiags...)
 	if diags.HasErrors() {
 		parser.DiagWriter.WriteDiagnostics(diags)
 		os.Exit(1)
 	}
 
-	fmt.Fprintln(os.Stdout, fileName)
-
+	if overwrite {
+		fmt.Fprintln(os.Stdout, fileName)
+	}
 }
 
 func Help() cli.HelpFunc {
