@@ -7,22 +7,17 @@ import (
 	"os"
 	"text/tabwriter"
 
+	"github.com/bschaatsbergen/hclfmt/internal/format"
 	"github.com/bschaatsbergen/hclfmt/internal/parse"
 	"github.com/bschaatsbergen/hclfmt/internal/write"
 	"github.com/bschaatsbergen/hclfmt/version"
 	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/mitchellh/cli"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 const (
 	cliName = "hclfmt"
-)
-
-var (
-	overwrite  bool
-	diagWriter hcl.DiagnosticWriter
 )
 
 func main() {
@@ -37,7 +32,10 @@ func main() {
 		fmt.Fprint(os.Stdout, cli.HelpFunc(cli.Commands))
 		os.Exit(0)
 	}
-	flags.BoolVar(&overwrite, "write", false, "write result to source file instead of stdout")
+
+	flagStore := NewFlagStore()
+	flags.BoolVar(&flagStore.Overwrite, "write", true, "write result to source file instead of stdout")
+	flags.BoolVar(&flagStore.Diff, "diff", false, "display diffs of formatting changes")
 
 	if err := flags.Parse(cli.Args); err != nil {
 		fmt.Fprintf(os.Stderr, "Error parsing flags: %v\n", err)
@@ -62,12 +60,12 @@ func main() {
 
 	parser := parse.NewParser()
 
-	color := terminal.IsTerminal(int(os.Stderr.Fd()))
-	width, _, err := terminal.GetSize(int(os.Stdout.Fd()))
+	color := term.IsTerminal(int(os.Stderr.Fd()))
+	width, _, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {
 		width = 80
 	}
-	diagWriter = hcl.NewDiagnosticTextWriter(os.Stderr, parser.Files(), uint(width), color)
+	diagWriter := hcl.NewDiagnosticTextWriter(os.Stderr, parser.Files(), uint(width), color)
 
 	_, err = os.Stat(fileName)
 	if err != nil {
@@ -87,16 +85,51 @@ func main() {
 		os.Exit(1)
 	}
 
-	f.Bytes = hclwrite.Format(f.Bytes)
+	formattedBytes := format.FormatHCL(f.Bytes)
 
-	writeDiags := write.WriteHCL(f, fileName, overwrite)
+	if !flagStore.Overwrite {
+		_, err := fmt.Fprintln(os.Stdout, string(formattedBytes))
+		if err != nil {
+			diags = append(diags, &hcl.Diagnostic{
+				Severity: hcl.DiagError,
+				Summary:  "Failed to write to stdout",
+				Detail:   err.Error(),
+			})
+			diagWriter.WriteDiagnostics(diags)
+			os.Exit(1)
+		}
+
+		// We're done, so exit successfully
+		os.Exit(0)
+	}
+
+	if flagStore.Diff {
+		diff, err := bytesDiff(formattedBytes, f.Bytes, fileName)
+		if err != nil {
+			diags = append(diags, &hcl.Diagnostic{
+				Severity: hcl.DiagError,
+				Summary:  "Failed to diff",
+				Detail:   err.Error(),
+			})
+			diagWriter.WriteDiagnostics(diags)
+			os.Exit(1)
+		}
+		if len(diff) > 0 {
+			fmt.Fprintln(os.Stdout, string(diff))
+		}
+
+		// We're done, so exit successfully
+		os.Exit(0)
+	}
+
+	writeDiags := write.WriteHCL(f, fileName)
 	diags = append(diags, writeDiags...)
 	if diags.HasErrors() {
 		diagWriter.WriteDiagnostics(diags)
 		os.Exit(1)
 	}
 
-	if overwrite {
+	if flagStore.Overwrite {
 		fmt.Fprintln(os.Stdout, fileName)
 	}
 }
