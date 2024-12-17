@@ -1,0 +1,37 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Visit https://golangci-lint.run/ for usage documentation and information on other useful linters
+issues:
+  max-per-linter: 0
+  max-same-issues: 0
+
+  exclude-rules:
+    # disable funlen for test funcs
+    - source: "^func Test"
+      linters:
+        - funlen
+linters:
+  disable-all: true
+  enable:
+    - goimports
+    - gocritic
+    - misspell
+    - govet
+    - ineffassign
+    - unconvert
+    - gofmt
+    - gosimple
+    - staticcheck
+    - asasalint
+    - asciicheck
+    - bidichk
+    - unused
+    - bodyclose
+    - dogsled
+    - durationcheck
+    - errchkjson
+    - errorlint
+    - copyloopvar
+    - usestdlibvars
+  fast: false
