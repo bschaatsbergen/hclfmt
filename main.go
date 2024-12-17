@@ -5,19 +5,27 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strings"
 	"text/tabwriter"
 
+	"github.com/bschaatsbergen/hclfmt/internal/parse"
+	"github.com/bschaatsbergen/hclfmt/internal/write"
 	"github.com/bschaatsbergen/hclfmt/version"
+	"github.com/hashicorp/hcl/v2"
 	"github.com/mitchellh/cli"
 )
 
+const (
+	cliName = "hclfmt"
+)
+
 func main() {
-	cli := cli.NewCLI("hclfmt", version.Version)
+	var diags hcl.Diagnostics
+
+	cli := cli.NewCLI(cliName, version.Version)
 	cli.Args = os.Args[1:]
 	cli.HelpFunc = Help()
 
-	flags := flag.NewFlagSet("hclfmt", flag.ExitOnError)
+	flags := flag.NewFlagSet(cliName, flag.ExitOnError)
 	flags.Usage = func() {
 		fmt.Fprint(os.Stdout, cli.HelpFunc(cli.Commands))
 		os.Exit(0)
@@ -38,9 +46,29 @@ func main() {
 		os.Exit(0)
 	}
 
-	// Default behavior if no version or help flag is provided
-	fmt.Fprintln(os.Stderr, "Invalid usage. Use -help for usage information.")
-	os.Exit(1)
+	if flags.NArg() != 1 {
+		fmt.Fprintf(os.Stderr, "You must specify exactly one file to format\n")
+		os.Exit(1)
+	}
+	fileName := flags.Arg(0)
+
+	parser := parse.NewParser()
+	f, parseDiags := parser.ParseHCL(fileName)
+	diags = append(diags, parseDiags...)
+	if diags.HasErrors() {
+		parser.DiagWriter.WriteDiagnostics(diags)
+		os.Exit(1)
+	}
+
+	writeDiags := write.WriteHCL(f, fileName)
+	diags = append(diags, writeDiags...)
+	if diags.HasErrors() {
+		parser.DiagWriter.WriteDiagnostics(diags)
+		os.Exit(1)
+	}
+
+	fmt.Fprintln(os.Stdout, fileName)
+
 }
 
 func Help() cli.HelpFunc {
@@ -54,6 +82,6 @@ func Help() cli.HelpFunc {
 		fmt.Fprintln(tw, "Examples:")
 		fmt.Fprintln(tw, "    hclfmt example.hcl")
 
-		return strings.TrimSpace(b.String())
+		return b.String()
 	}
 }
