@@ -115,6 +115,8 @@ func main() {
 		diagWriter.WriteDiagnostics(diags)
 		os.Exit(1)
 	}
+	// No errors, exit
+	os.Exit(0)
 }
 
 func processFile(fileName string) hcl.Diagnostics {
