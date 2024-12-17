@@ -1,4 +1,4 @@
 resource "foobar" "test" {
   name = "foobar"
-    tags = ["a", "b", "c"]
+  tags = ["a", "b", "c"]
 }
