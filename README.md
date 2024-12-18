@@ -48,4 +48,4 @@ There are currently two options:
 
 - `-write`: By default, `hclfmt` will overwrite the input file with the formatted output. You can set the `-write` option to `false` to print the formatted output to stdout.
 - `-diff`: If you want to see the differences between the input and formatted output, you can set the `-diff` option to `true`.
-
+- `-recursive`: If you want to walk the directory recursively and format all `.hcl` files, you can set the `-recursive` option to `true`.
