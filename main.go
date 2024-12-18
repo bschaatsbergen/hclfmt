@@ -84,7 +84,6 @@ Examples:
 Supported file extensions:
   .hcl
 `
-
 		return helpText
 	}
 }
