@@ -41,7 +41,46 @@ Pre-built packages for Darwin and Linux are also available on the [Releases page
 ## Usage
 
 ```sh
-Usage: hclfmt [-help] [options] [-version] [args]
+$ hclfmt -help
+Usage: hclfmt [options] <file or directory>
+
+Description:
+  Formats all HCL configuration files to a canonical format. Supported
+  configuration files (.hcl) are updated in place unless otherwise specified.
+
+  By default, hclfmt scans the current directory for HCL configuration files.
+  If you provide a directory as the target argument, hclfmt will scan that
+  directory recursively when the -recursive flag is set. If you provide a file,
+  hclfmt will process only that file.
+
+Options:
+  -write=true
+      Write formatted output back to the source file (default: true).
+
+  -diff
+      Display diffs of formatting changes without modifying files.
+
+  -recursive
+      Recursively format HCL files in the specified directory.
+
+  -help
+      Show this help message.
+
+  -version
+      Display the version of hclfmt.
+
+Examples:
+  hclfmt example.hcl
+      Formats the specified file.
+
+  hclfmt -recursive ./directory
+      Formats all supported HCL files in the specified directory and its subdirectories.
+
+  hclfmt -diff example.hcl
+      Displays the formatting changes for the specified file without modifying it.
+
+Supported file extensions:
+  .hcl
 ```
 
 There are currently two options:
