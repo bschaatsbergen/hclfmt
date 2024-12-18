@@ -3,17 +3,25 @@
 An HCL (HashiCorp Configuration Language) formatter.
 
 ### You won't quickly need this
-At HashiCorp we recommend that products using HCL implement their own formatter, such as `terraform fmt`. Applications typically extend the generic formatting rules to include domain-specific logic, ensuring that formatting aligns with the idiomatic structures they recommend in their documentation. Think of this repository as a reference implementation for a generic HCL formatter, that you can use as a starting point for your own implementation—or if you just need a quick way to format a plain HCL file.
+Our recommendation is that products implementing HCL provide their own formatters, as seen in tools like Terraform, Packer, and others. This allows applications to extend the generic formatting rules with domain-specific logic, ensuring that formatting not only adheres to general HCL conventions but also aligns with the idiomatic patterns and best practices outlined in their documentation. Sometimes this is something simple as reordering attributes or adjusting indentation, but it also extends to enforcing specific conventions for expressions and relationships within the configuration.
 
-Applications that do implement their own formatter typically build on top of the generic HCL formatting process but extend it with logic to handle domain-specific constructs and idiomatic conventions. Here’s how that process generally works:
+Applications that do implement their own formatter often build on the generic HCL formatting process, extending it with additional logic to support domain-specific constructs and enforce idiomatic conventions based on their configuration standards.
 
-1. Applications use [hclwrite](https://pkg.go.dev/github.com/hashicorp/hcl/v2/hclwrite) parser to generate a hybrid structure that produces an abstract / physical syntax tree. This hybrid structure allows for both logical analysis and any surgical changes to normalize the configuration.
-2. The application adds custom logic to normalize HCL configurations by rewriting constructs into the idiomatic form preferred by the application. This may involve reordering attributes, adjusting whitespace, modifying indentation, or enforcing specific conventions for expressions and relationships within the configuration.
-3. Once the normalization is complete, the formatter serializes the updated AST back into HCL syntax using [hclwrite](https://pkg.go.dev/github.com/hashicorp/hcl/v2/hclwrite) package's formatter.
+1. **Parse the HCL configuration**  
+   Use the [`hclwrite`](https://pkg.go.dev/github.com/hashicorp/hcl/v2/hclwrite) package to parse the HCL configuration. This generates a hybrid syntax tree that combines an abstract syntax tree (AST) with physical representation. This structure enables logical analysis and precise modifications, allowing for targeted changes to the configuration.
 
-Bear in mind that any normalization process must be idempotent, meaning that running the formatter multiple times on the same input should produce the same result. If it does not, consider it a bug that needs to be fixed.
+2. **Normalize the configuration**  
+   Add custom logic to normalize the HCL configuration according to the application's idiomatic preferences. This process may include:
+   - Reordering attributes to align with conventions.
+   - Adjusting whitespace and indentation for readability and consistency.
+   - Enforcing domain-specific conventions for expressions, object relationships, and configuration constructs.
 
-Whatever you do, don’t use this tool as a replacement for a proper application-specific formatter.
+3. **Serialize back to HCL**
+   After normalization, serialize the updated syntax tree back into HCL syntax using the [`hclwrite`](https://pkg.go.dev/github.com/hashicorp/hcl/v2/hclwrite) package. This ensures the final configuration is clean, consistent, and adheres to both HCL conventions and the application's formatting standards.
+
+Bear in mind that any normalization process must be **idempotent**, meaning running the formatter multiple times on the same input should always produce the same result. If it doesn’t, treat it as a bug that needs to be addressed.
+
+Above all, don’t rely on this tool as a substitute for a proper, application-specific formatter.
 
 ### "Isn't it all just HCL?"
 [@apparentlymart](https://github.com/apparentlymart) explains this far better than I ever could:
