@@ -8,7 +8,7 @@ Our recommendation is that products implementing HCL provide their own formatter
 Applications that do implement their own formatter often build on the generic HCL formatting process, extending it with additional logic to support domain-specific constructs and enforce idiomatic conventions based on their configuration standards.
 
 1. **Parse the HCL configuration**  
-   Use the [`hclwrite`](https://pkg.go.dev/github.com/hashicorp/hcl/v2/hclwrite) package to parse the HCL configuration. This generates a hybrid syntax tree that combines an abstract syntax tree (AST) with physical representation. This structure enables logical analysis and precise modifications, allowing for targeted changes to the configuration.
+   Use the [`hclwrite`](https://pkg.go.dev/github.com/hashicorp/hcl/v2/hclwrite) package to parse the HCL configuration. This generates a hybrid syntax tree that combines an abstract / physical syntax tree (AST). This allows the application to make any surgical changes where necessary.
 
 2. **Normalize the configuration**  
    Add custom logic to normalize the HCL configuration according to the application's idiomatic preferences. This process may include:
