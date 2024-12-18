@@ -1,13 +1,11 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
-	"text/tabwriter"
 
 	"github.com/bschaatsbergen/hclfmt/internal/parse"
 	"github.com/bschaatsbergen/hclfmt/internal/write"
@@ -209,51 +207,49 @@ func processFile(fileName string) hcl.Diagnostics {
 
 func Help() cli.HelpFunc {
 	return func(commands map[string]cli.CommandFactory) string {
-		var b bytes.Buffer
-		tw := tabwriter.NewWriter(&b, 0, 8, 1, ' ', 0)
-		defer tw.Flush()
+		helpText := `
+Usage: hclfmt [options] <file or directory>
 
-		fmt.Fprintln(tw, "Usage: hclfmt [options] <file or directory>")
-		fmt.Fprintln(tw)
-		fmt.Fprintln(tw, "Description:")
-		fmt.Fprintln(tw, "  Formats all HCL configuration files to a canonical format. Supported")
-		fmt.Fprintln(tw, "  configuration files (.hcl) are updated in place unless otherwise specified.")
-		fmt.Fprintln(tw)
-		fmt.Fprintln(tw, "  By default, hclfmt scans the current directory for HCL configuration files.")
-		fmt.Fprintln(tw, "  If you provide a directory as the target argument, hclfmt will scan that")
-		fmt.Fprintln(tw, "  directory recursively when the -recursive flag is set. If you provide a file,")
-		fmt.Fprintln(tw, "  hclfmt will process only that file.")
-		fmt.Fprintln(tw)
-		fmt.Fprintln(tw, "Options:")
-		fmt.Fprintln(tw, "  -write=true")
-		fmt.Fprintln(tw, "      Write formatted output back to the source file (default: true).")
-		fmt.Fprintln(tw)
-		fmt.Fprintln(tw, "  -diff")
-		fmt.Fprintln(tw, "      Display diffs of formatting changes without modifying files.")
-		fmt.Fprintln(tw)
-		fmt.Fprintln(tw, "  -recursive")
-		fmt.Fprintln(tw, "      Recursively format HCL files in the specified directory.")
-		fmt.Fprintln(tw)
-		fmt.Fprintln(tw, "  -help")
-		fmt.Fprintln(tw, "      Show this help message.")
-		fmt.Fprintln(tw)
-		fmt.Fprintln(tw, "  -version")
-		fmt.Fprintln(tw, "      Display the version of hclfmt.")
-		fmt.Fprintln(tw)
-		fmt.Fprintln(tw, "Examples:")
-		fmt.Fprintln(tw, "  hclfmt example.hcl")
-		fmt.Fprintln(tw, "      Formats the specified file.")
-		fmt.Fprintln(tw)
-		fmt.Fprintln(tw, "  hclfmt -recursive ./directory")
-		fmt.Fprintln(tw, "      Formats all supported HCL files in the specified directory and its subdirectories.")
-		fmt.Fprintln(tw)
-		fmt.Fprintln(tw, "  hclfmt -diff example.hcl")
-		fmt.Fprintln(tw, "      Displays the formatting changes for the specified file without modifying it.")
-		fmt.Fprintln(tw)
-		fmt.Fprintln(tw, "Supported file extensions:")
-		fmt.Fprintln(tw, "  .hcl")
+Description:
+  Formats all HCL configuration files to a canonical format. Supported
+  configuration files (.hcl) are updated in place unless otherwise specified.
 
-		return b.String()
+  By default, hclfmt scans the current directory for HCL configuration files.
+  If you provide a directory as the target argument, hclfmt will scan that
+  directory recursively when the -recursive flag is set. If you provide a file,
+  hclfmt will process only that file.
+
+Options:
+  -write=true
+      Write formatted output back to the source file (default: true).
+
+  -diff
+      Display diffs of formatting changes without modifying files.
+
+  -recursive
+      Recursively format HCL files in the specified directory.
+
+  -help
+      Show this help message.
+
+  -version
+      Display the version of hclfmt.
+
+Examples:
+  hclfmt example.hcl
+      Formats the specified file.
+
+  hclfmt -recursive ./directory
+      Formats all supported HCL files in the specified directory and its subdirectories.
+
+  hclfmt -diff example.hcl
+      Displays the formatting changes for the specified file without modifying it.
+
+Supported file extensions:
+  .hcl
+`
+
+		return helpText
 	}
 }
 
