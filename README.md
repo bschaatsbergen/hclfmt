@@ -1,6 +1,6 @@
 # hclfmt
 
-An HCL (HashiCorp Configuration Language) formatter you probably won’t need.
+An HCL (HashiCorp Configuration Language) formatter.
 
 ### You probably won't need this
 Our recommendation is that products implementing HCL provide their own formatters, as seen in tools like Terraform, Packer, and others. This allows applications to extend the generic formatting rules with domain-specific logic, ensuring that formatting not only adheres to general HCL conventions but also aligns with the idiomatic patterns and best practices outlined in their documentation. Sometimes this is something simple as reordering attributes or adjusting indentation, but it also extends to enforcing specific conventions for expressions and relationships within the configuration.
