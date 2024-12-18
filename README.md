@@ -29,7 +29,7 @@ From source:
 ```sh
 git clone git@github.com:bschaatsbergen/hclfmt
 cd hclfmt
-go build
+make
 ```
 
 ## Usage
