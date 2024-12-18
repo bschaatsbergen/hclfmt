@@ -16,7 +16,7 @@ Applications that do implement their own formatter often build on the generic HC
    - Adjusting whitespace and indentation for readability and consistency.
    - Enforcing domain-specific conventions for expressions, object relationships, and configuration constructs.
 
-3. **Serialize back to HCL**
+3. **Serialize back to HCL**  
    After normalization, serialize the updated syntax tree back into HCL syntax using the [`hclwrite`](https://pkg.go.dev/github.com/hashicorp/hcl/v2/hclwrite) package. This ensures the final configuration is clean, consistent, and adheres to both HCL conventions and the application's formatting standards.
 
 Bear in mind that any normalization process must be **idempotent**, meaning running the formatter multiple times on the same input should always produce the same result. If it doesn’t, treat it as a bug that needs to be addressed.
