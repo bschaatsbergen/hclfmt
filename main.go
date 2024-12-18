@@ -122,9 +122,24 @@ func main() {
 func processFile(fileName string) hcl.Diagnostics {
 	var diags hcl.Diagnostics
 
+	bytes, err := os.ReadFile(fileName)
+	if err != nil {
+		diags = append(diags, &hcl.Diagnostic{
+			Severity: hcl.DiagError,
+			Summary:  fmt.Sprintf("Failed to read file: \"%s\"", fileName),
+			Detail:   err.Error(),
+		})
+		return diags
+	}
+
 	formattedBytes, formatDiags := format(fileName)
 	diags = append(diags, formatDiags...)
 	if diags.HasErrors() {
+		return diags
+	}
+
+	// If the file is already formatted, we simply return
+	if string(bytes) == string(formattedBytes) {
 		return diags
 	}
 
@@ -142,16 +157,6 @@ func processFile(fileName string) hcl.Diagnostics {
 	}
 
 	if flagStore.Diff {
-		bytes, err := os.ReadFile(fileName)
-		if err != nil {
-			diags = append(diags, &hcl.Diagnostic{
-				Severity: hcl.DiagError,
-				Summary:  fmt.Sprintf("Failed to read file: \"%s\"", fileName),
-				Detail:   err.Error(),
-			})
-			return diags
-		}
-
 		diff, err := bytesDiff(formattedBytes, bytes, fileName)
 		if err != nil {
 			diags = append(diags, &hcl.Diagnostic{
