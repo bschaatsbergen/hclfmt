@@ -13,8 +13,6 @@ In our own applications, we use the hclwrite package to parse HCL into a hybrid 
 
 Bear in mind that any normalization process must be **idempotent**, meaning running the formatter multiple times on the same input should always produce the same result. If it doesn’t, treat it as a bug that needs to be addressed.
 
-Above all, don’t rely on this tool as a substitute for a proper, application-specific formatter.
-
 ### "Isn't it all just HCL?"
 [@apparentlymart](https://github.com/apparentlymart) explains this far better than I ever could:
 > Unlike some other formats like JSON and YAML, a HCL file is more like a program to be executed than a data structure to be parsed, and so there's considerably more application-level interpretation to be done than you might be accustomed to with other grammars.
@@ -22,6 +20,8 @@ Above all, don’t rely on this tool as a substitute for a proper, application-s
 > HCL is designed as a toolkit for building languages rather than as a language in its own right, but it's true that a bunch of the existing HCL-based languages aren't doing that much above what HCL itself offers, aside from defining their expected block types and attributes.
 
 > The languages that allow for e.g. creating relationships between declared objects via expressions, or writing "libraries" like Terraform's modules, will tend to bend HCL in more complicated ways than where HCL is being used mainly just as a serialization of a flat data structure. To be specific, I would expect the Terraform Language, the Packer Language and the Waypoint Language to all eventually benefit from application-specific extensions with their own formatters, but something like Vault's policy language or Consul's agent configuration files would probably suffice with a generic HCL extension and generic formatter.
+
+Above all, don’t rely on this tool as a substitute for a proper, application-specific formatter.
 
 ## Installing
 
