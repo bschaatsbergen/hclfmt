@@ -3,9 +3,9 @@
 An HCL (HashiCorp Configuration Language) formatter.
 
 ### You probably won't need this
-Our recommendation is that products implementing HCL provide their own formatters, as seen in tools like Terraform, Packer, and others. This allows applications to extend the generic formatting rules with domain-specific logic, ensuring that formatting not only adheres to general HCL conventions but also aligns with the idiomatic patterns and best practices outlined in their documentation. Sometimes this is something simple as reordering attributes or adjusting indentation, but it also extends to enforcing specific conventions for expressions and relationships within the configuration.
+Our recommendation is that applications implementing HCL provide their own formatters, as seen in tools like Terraform, Packer, and others. This allows applications to extend generic formatting rules with domain-specific logic, ensuring that formatting not only adheres to general HCL conventions but also aligns with their idiomatic patterns and best practices. This could be as simple as reordering attributes or adjusting indentation, but it also extends to enforcing specific conventions for expressions and relationships within the configuration.
 
-Applications that do implement their own formatter often build on the generic HCL formatting process, extending it with additional logic to support domain-specific constructs and enforce idiomatic conventions based on their configuration standards.
+Applications that implement their own formatters often build on the generic HCL formatting process, extending it with additional logic to support domain-specific constructs and enforce idiomatic conventions based on their configuration practices.
 
 1. **Parse the HCL configuration**  
    Use the [`hclwrite`](https://pkg.go.dev/github.com/hashicorp/hcl/v2/hclwrite) package to parse the HCL configuration, generating a hybrid syntax tree that combines an abstract / physical syntax tree (AST).This allows the application to make any surgical changes where necessary in the next step.
