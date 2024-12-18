@@ -28,6 +28,7 @@ var (
 	parser     = parse.NewParser()
 	diagWriter hcl.DiagnosticWriter
 
+	// Supported file extensions for formatting
 	fmtSupportedExts = map[string]bool{
 		".hcl": true,
 	}
@@ -45,6 +46,7 @@ func main() {
 func run() hcl.Diagnostics {
 	var diags hcl.Diagnostics
 
+	// CLI initialization and argument parsing.
 	cli := cli.NewCLI(cliName, version.Version)
 	cli.Args = os.Args[1:]
 	cli.HelpFunc = Help()
@@ -54,6 +56,7 @@ func run() hcl.Diagnostics {
 		fmt.Fprint(os.Stdout, cli.HelpFunc(cli.Commands))
 	}
 
+	// A flag store simply holds the parsed flags for later use.
 	flagStore = NewFlagStore()
 	flags.BoolVar(&flagStore.Overwrite, "write", true, "write result to source file instead of stdout")
 	flags.BoolVar(&flagStore.Diff, "diff", false, "display diffs of formatting changes")
@@ -68,16 +71,17 @@ func run() hcl.Diagnostics {
 		return diags
 	}
 
+	// Handle version and help flags.
 	if cli.IsVersion() {
 		fmt.Fprintln(os.Stdout, cli.Version)
 		return diags
 	}
-
 	if cli.IsHelp() {
 		fmt.Fprintln(cli.HelpWriter, cli.HelpFunc(cli.Commands))
 		return diags
 	}
 
+	// Ensure exactly one target (file or directory) is specified.
 	if flags.NArg() != 1 {
 		diags = append(diags, &hcl.Diagnostic{
 			Severity: hcl.DiagError,
@@ -87,13 +91,15 @@ func run() hcl.Diagnostics {
 	}
 	target := flags.Arg(0)
 
+	// Configure diagnostic writer.
 	color := term.IsTerminal(int(os.Stderr.Fd()))
 	width, _, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {
-		width = 80
+		width = 80 // Default terminal width if size retrieval fails.
 	}
 	diagWriter = hcl.NewDiagnosticTextWriter(os.Stderr, parser.Files(), uint(width), color)
 
+	// Handle recursive formatting.
 	if flagStore.Recursive {
 		err := filepath.WalkDir(target, func(path string, d fs.DirEntry, walkErr error) error {
 			if walkErr != nil {
@@ -102,18 +108,18 @@ func run() hcl.Diagnostics {
 					Summary:  "Error accessing path",
 					Detail:   fmt.Sprintf("Path: %s, Error: %s", path, walkErr),
 				})
-				return nil // Continue walking, collect diagnostics
+				return nil // Collect diagnostics and continue walking.
 			}
 
-			// Process files only if they are supported
+			// Only process supported files
 			if !d.IsDir() && isSupportedFile(path) {
 				processDiags := processFile(path)
 				diags = append(diags, processDiags...)
 			}
-			return nil // Collect processing diagnostics, continue walking
+			return nil // Collect diagnostics and continue walking.
 		})
 
-		// If WalkDir itself failed, append the error to diagnostics
+		// Something else went wrong during the walk.
 		if err != nil {
 			diags = append(diags, &hcl.Diagnostic{
 				Severity: hcl.DiagError,
@@ -122,11 +128,10 @@ func run() hcl.Diagnostics {
 			})
 		}
 
-		// Return all collected diagnostics
 		return diags
 	}
 
-	// By default, process a single given file
+	// By default, we process a single file.
 	processDiags := processFile(target)
 	diags = append(diags, processDiags...)
 	return diags
@@ -135,6 +140,7 @@ func run() hcl.Diagnostics {
 func processFile(fileName string) hcl.Diagnostics {
 	var diags hcl.Diagnostics
 
+	// Read file contents.
 	bytes, err := os.ReadFile(fileName)
 	if err != nil {
 		diags = append(diags, &hcl.Diagnostic{
@@ -145,17 +151,19 @@ func processFile(fileName string) hcl.Diagnostics {
 		return diags
 	}
 
+	// Format file contents.
 	formattedBytes, formatDiags := format(fileName)
 	diags = append(diags, formatDiags...)
 	if diags.HasErrors() {
 		return diags
 	}
 
-	// If the file is already formatted, we simply return
+	// Exit early if file is in canonical form.
 	if string(bytes) == string(formattedBytes) {
 		return diags
 	}
 
+	// Write to stdout or perform diffs based on flags.
 	if !flagStore.Overwrite {
 		_, err := fmt.Fprintln(os.Stdout, string(formattedBytes))
 		if err != nil {
@@ -185,6 +193,7 @@ func processFile(fileName string) hcl.Diagnostics {
 		return diags
 	}
 
+	// Write the produced result to the source file.
 	writeDiags := write.WriteHCL(formattedBytes, fileName)
 	diags = append(diags, writeDiags...)
 	if diags.HasErrors() {
@@ -233,6 +242,7 @@ func format(fileName string) ([]byte, hcl.Diagnostics) {
 		return nil, diags
 	}
 
+	// Perform the necessary surgical changes.
 	return hclwrite.Format(f.Bytes), diags
 }
 
