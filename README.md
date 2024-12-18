@@ -25,18 +25,12 @@ Above all, don’t rely on this tool as a substitute for a proper, application-s
 
 ## Installing
 
-```sh
-brew install <coming-soon>
-```
-
 From source:
 ```sh
 git clone git@github.com:bschaatsbergen/hclfmt
 cd hclfmt
-make
+go build
 ```
-
-Pre-built packages for Darwin and Linux are also available on the [Releases page](https://github.com/bschaatsbergen/hclfmt/releases).
 
 ## Usage
 
