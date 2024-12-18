@@ -61,7 +61,7 @@ Options:
       Display diffs of formatting changes without modifying files.
 
   -recursive
-      Recursively format HCL files in the specified directory.
+      Recursively rewrite HCL configuration files from the specified directory.
 
   -help
       Show this help message.
