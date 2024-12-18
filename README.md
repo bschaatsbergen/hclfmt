@@ -3,7 +3,7 @@
 An HCL (HashiCorp Configuration Language) formatter.
 
 ### You won't quickly need this
-At HashiCorp we recommend that products using HCL implement their own formatter, such as `terraform fmt` or `nomad fmt`. Applications typically extend the generic formatting rules to include domain-specific logic, ensuring that formatting aligns with the idiomatic structures they recommend in their documentation. Think of this repository as a reference implementation for a generic HCL formatter, that you can use as a starting point for your own implementation—or if you just need a quick way to format a plain HCL file.
+At HashiCorp we recommend that products using HCL implement their own formatter, such as `terraform fmt`. Applications typically extend the generic formatting rules to include domain-specific logic, ensuring that formatting aligns with the idiomatic structures they recommend in their documentation. Think of this repository as a reference implementation for a generic HCL formatter, that you can use as a starting point for your own implementation—or if you just need a quick way to format a plain HCL file.
 
 Applications that do implement their own formatter typically build on top of the generic HCL formatting process but extend it with logic to handle domain-specific constructs and idiomatic conventions. Here’s how that process generally works:
 
