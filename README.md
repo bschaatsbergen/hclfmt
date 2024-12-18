@@ -21,7 +21,7 @@ Bear in mind that any normalization process must be **idempotent**, meaning runn
 
 > The languages that allow for e.g. creating relationships between declared objects via expressions, or writing "libraries" like Terraform's modules, will tend to bend HCL in more complicated ways than where HCL is being used mainly just as a serialization of a flat data structure. To be specific, I would expect the Terraform Language, the Packer Language and the Waypoint Language to all eventually benefit from application-specific extensions with their own formatters, but something like Vault's policy language or Consul's agent configuration files would probably suffice with a generic HCL extension and generic formatter.
 
-Above all, don’t rely on this tool as a substitute for a proper, application-specific formatter.
+Above all, consider this repository a learning resource and a reference for creating your own HCL formatter.
 
 ## Installing
 
