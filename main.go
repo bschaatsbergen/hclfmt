@@ -11,7 +11,6 @@ import (
 	"github.com/bschaatsbergen/hclfmt/internal/write"
 	"github.com/bschaatsbergen/hclfmt/version"
 	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/mitchellh/cli"
 	"golang.org/x/term"
 )
@@ -265,14 +264,13 @@ func format(fileName string) ([]byte, hcl.Diagnostics) {
 		return nil, diags
 	}
 
-	f, parseDiags := parser.ParseHCL(fileName)
+	f, parseDiags := parser.ParseConfig(fileName)
 	diags = append(diags, parseDiags...)
 	if diags.HasErrors() {
 		return nil, diags
 	}
 
-	// Perform the necessary surgical changes.
-	return hclwrite.Format(f.Bytes), diags
+	return f.Bytes(), diags
 }
 
 func isSupportedFile(path string) bool {

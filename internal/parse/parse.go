@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
+	"github.com/hashicorp/hcl/v2/hclwrite"
 )
 
 // Parser knows how to parse HCL files.
@@ -20,10 +21,10 @@ func NewParser() *Parser {
 	}
 }
 
-// ParseHCL is a simple wrapper around hclparse.Parser.ParseHCL.
-// It reads the content of the given file and parses it into an *hcl.File.
+// ParseConfig is a simple wrapper around hclparse.Parser.ParseConfig.
+// It reads the content of the given file and parses it into an *hclwrite.File.
 // The function returns the parsed file along with any diagnostics produced.
-func (p *Parser) ParseHCL(fileName string) (*hcl.File, hcl.Diagnostics) {
+func (p *Parser) ParseConfig(fileName string) (*hclwrite.File, hcl.Diagnostics) {
 	var diags hcl.Diagnostics
 
 	inContent, err := os.ReadFile(fileName)
@@ -36,8 +37,14 @@ func (p *Parser) ParseHCL(fileName string) (*hcl.File, hcl.Diagnostics) {
 		return nil, diags
 	}
 
-	f, diags := p.Parser.ParseHCL(inContent, fileName)
-	if diags.HasErrors() {
+	p.Parser.AddFile(fileName, &hcl.File{
+		Body:  hcl.EmptyBody(),
+		Bytes: inContent,
+	})
+
+	f, hclDiags := hclwrite.ParseConfig(inContent, fileName, hcl.InitialPos)
+	if hclDiags.HasErrors() {
+		diags = append(diags, hclDiags...)
 		return nil, diags
 	}
 
