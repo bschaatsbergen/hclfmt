@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"text/tabwriter"
 
 	"github.com/bschaatsbergen/hclfmt/internal/parse"
@@ -28,8 +27,8 @@ var (
 	parser     = parse.NewParser()
 	diagWriter = hcl.NewDiagnosticTextWriter(os.Stderr, nil, 80, true)
 
-	fmtSupportedExts = []string{
-		".hcl",
+	fmtSupportedExts = map[string]bool{
+		".hcl": true,
 	}
 )
 
@@ -227,10 +226,5 @@ func format(fileName string) ([]byte, hcl.Diagnostics) {
 }
 
 func isSupportedFile(path string) bool {
-	for _, ext := range fmtSupportedExts {
-		if strings.HasSuffix(path, ext) {
-			return true
-		}
-	}
-	return false
+	return fmtSupportedExts[filepath.Ext(path)]
 }
