@@ -7,7 +7,8 @@ import (
 	"github.com/hashicorp/hcl/v2"
 )
 
-// WriteHCL writes the given HCL file to the given file name.
+// WriteHCL writes a byte slice to a file,
+// In this context, it is used to write the formatted HCL to the source file.
 func WriteHCL(src []byte, fileName string) hcl.Diagnostics {
 	var diags hcl.Diagnostics
 
