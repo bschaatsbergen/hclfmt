@@ -3,21 +3,13 @@
 An HCL (HashiCorp Configuration Language) formatter.
 
 ### You probably won't need this
-Our recommendation is that applications implementing HCL provide their own formatters, as seen in tools like Terraform, Packer, and others. This allows applications to extend generic formatting rules with domain-specific logic, ensuring that formatting not only adheres to general HCL conventions but also aligns with their idiomatic patterns and best practices. This could be as simple as reordering attributes or adjusting indentation, but it also extends to enforcing specific conventions for expressions and relationships within the configuration.
+Sometimes, people ask why there isn’t a generic formatter for HCL (HashiCorp Configuration Language). The short answer is that HCL was designed as a framework for building languages, not as a standalone language, so it’s up to each application to define how formatting should work. Tools like Terraform and Packer include their own formatters, which extend basic HCL conventions with domain-specific rules. This ensures formatting aligns not only with general HCL syntax but also with the specific idiomatic patterns and best practices of the application.
 
-Applications that implement their own formatters often build on the generic HCL formatting process, extending it with additional logic to support domain-specific constructs and enforce idiomatic conventions based on their configuration practices.
+For example, an application might reorder attributes, adjust indentation, or enforce conventions for expressions and relationships between blocks. These details go beyond generic formatting, reflecting the unique ways each tool uses HCL to model its domain.
 
-1. **Parse the HCL configuration**  
-   Use the [`hclwrite`](https://pkg.go.dev/github.com/hashicorp/hcl/v2/hclwrite) package to parse the HCL configuration, generating a hybrid syntax tree that combines an abstract / physical syntax tree (AST).This allows the application to make any surgical changes where necessary in the next step.
+Applications that provide their own formatters typically start with generic HCL formatting logic and layer on additional rules to handle their specific use cases. This lets them produce configurations that feel natural within their ecosystem, rather than forcing users into a one-size-fits-all approach.
 
-2. **Normalize the configuration**  
-   After parsing you typically execute custom logic (if any) to normalize the HCL configuration based on the application’s idiomatic preferences. This can include:
-   - Adjusting whitespace and indentation for readability and consistency.
-   - Reordering attributes to align with conventions.
-   - Enforcing domain-specific conventions for expressions, object relationships, and configuration constructs.
-
-3. **Serialize back to HCL**  
-   After normalization, serialize the updated syntax tree back into HCL syntax using the [`hclwrite`](https://pkg.go.dev/github.com/hashicorp/hcl/v2/hclwrite) package. This ensures the final configuration is clean, consistent, and adheres to both HCL conventions and the application's formatting standards.
+In our own applications, we use the hclwrite package to parse HCL into a hybrid syntax tree. This allows for precise, targeted edits—whether reordering blocks or rewriting expressions into an idiomatic form. The result is then serialized back into HCL, ensuring the output is clean and consistent.
 
 Bear in mind that any normalization process must be **idempotent**, meaning running the formatter multiple times on the same input should always produce the same result. If it doesn’t, treat it as a bug that needs to be addressed.
 
